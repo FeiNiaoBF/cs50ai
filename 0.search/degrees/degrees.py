@@ -115,22 +115,25 @@ def shortest_path(source, target):
         # Mark node as explored.
         explored.add(node.state)
 
-        # loop find neighbors for  node
-        for movie_id, person_id in neighbors_for_person(node.state):
-            # If node contains goal state, return the solution.
-            if person_id == target:
-                path.append((movie_id, person_id))
-                # print(f"{movie_id}--{person_id}")
-                while node.parent is not None:
-                    path.append(node.action)
-                    node = node.parent
-                path.reverse()
-                return path
+        # loop find neighbors for node
+        if node.state != target:
+            for movie_id, person_id in neighbors_for_person(node.state):
+                # If node contains goal state, return the solution.
+                if person_id == target:
+                    path.append((movie_id, person_id))
+                    # print(f"{movie_id}--{person_id}")
+                    while node.parent is not None:
+                        path.append(node.action)
+                        node = node.parent
+                    path.reverse()
+                    return path
 
-            #  Expand node, add resulting nodes to the frontier.
-            if not frontier.contains_state(person_id) and person_id not in explored:
-                child = Node(person_id, node, (movie_id, person_id))
-                frontier.add(child)
+                #  Expand node, add resulting nodes to the frontier.
+                elif not frontier.contains_state(person_id) and person_id not in explored:
+                    child = Node(person_id, node, (movie_id, person_id))
+                    frontier.add(child)
+        else:
+            return path
 
     return None
 
