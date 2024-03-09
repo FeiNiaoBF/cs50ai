@@ -277,14 +277,19 @@ class MinesweeperAI():
     def mark_safe_or_mine(self):
         # update knowledge base
         # update all cell of sentences
-        for sentence in self.knowledge:
-            if sentence.known_mines():
-                # RuntimeError: Set changed size during iteration so set copy
-                for cell in sentence.known_mines().copy():
-                    self.mark_mine(cell)
-            if sentence.known_safes():
-                for cell in sentence.known_safes().copy():
-                    self.mark_safe(cell)
+        knowledge_flag = True
+        while knowledge_flag:
+            knowledge_flag = False
+            for sentence in self.knowledge:
+                if sentence.known_mines():
+                    # RuntimeError: Set changed size during iteration so set copy
+                    for cell in sentence.known_mines().copy():
+                        self.mark_mine(cell)
+                        knowledge_flag = True
+                if sentence.known_safes():
+                    for cell in sentence.known_safes().copy():
+                        self.mark_safe(cell)
+                        knowledge_flag = True
 
 
     def new_inference(self, subset):
@@ -307,7 +312,9 @@ class MinesweeperAI():
             for c in range(cell[1] - 1, cell[1] + 2):
                 if (0 <= r < self.height and 0 <= c < self.width) \
                     and ((r, c) not in self.safes) \
-                    and ((r, c) not in self.moves_made):
+                    and ((r, c) not in self.mines) \
+                    and ((r, c) not in self.moves_made) \
+                    and ((r, c) != (cell[0], cell[1])):
                     tmp.add((r, c))
                 if (r, c) in self.mines:
                     count_mines += 1
